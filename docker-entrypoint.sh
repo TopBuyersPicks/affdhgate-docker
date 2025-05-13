@@ -1,12 +1,16 @@
 #!/bin/bash
-set -e
 
-# Install WordPress if not installed
-if [ ! -f /var/www/html/wp-config.php ]; then
-  wp core download --allow-root
-  wp config create --dbname=wordpress --dbuser=root --dbpass= --dbhost=localhost --allow-root
-  wp core install --url="http://localhost" --title="affDhgate" --admin_user=admin --admin_password=NokhodTop2 --admin_email=admin@example.com --skip-email --allow-root
-  wp plugin activate affdhgate --allow-root
+# Start Apache in the background
+apache2-foreground &
+sleep 5
+
+# Ensure WordPress is installed
+if ! wp core is-installed --allow-root; then
+  wp core install --url="http://localhost" --title="TopBuyersPicks" --admin_user="admin" --admin_password="NokhodTop2" --admin_email="admin@example.com" --allow-root
 fi
 
-exec "$@"
+# Activate the plugin
+wp plugin activate affdhgate --allow-root
+
+# Keep Apache running
+wait
